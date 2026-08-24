@@ -23,3 +23,11 @@ async def db_check(db: AsyncSession = Depends(get_db)):
             status_code=500,
             detail=f"Database connection failed: {str(e)}"
         )
+
+from fastapi import FastAPI
+from app.api.v1.endpoints.auth import router as auth_router
+
+app = FastAPI(title="BE-Espirit API")
+
+# Đăng ký router
+app.include_router(auth_router, prefix="/api/v1/auth", tags=["Auth"])
