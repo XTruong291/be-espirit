@@ -1,22 +1,31 @@
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel, ConfigDict, EmailStr
+from datetime import datetime
+from typing import Optional
 
-class UserRegisterRequest(BaseModel): #dữ liệu đăng ký người dùng 
+# Schema dữ liệu gửi lên khi Đăng ký
+class UserRegisterRequest(BaseModel):
     username: str
     email: EmailStr
     password: str
-    
-class UserResponse(BaseModel):#Dữ liệu trả về sau khi đăng ký 
+
+# Schema dữ liệu gửi lên khi Đăng nhập
+class UserLoginRequest(BaseModel):
+    username: str
+    password: str
+
+# Schema dữ liệu trả về cho Client (Cần cấu hình from_attributes)
+class UserResponse(BaseModel):
     id: int
     username: str
     email: EmailStr
     is_active: bool
-    class Config:
-        from_attributes = True
-        
-class UserLoginRequest(BaseModel):#Dữ liệu gửi lên khi đăng nhập
-    username: str
-    password: str
-    
-class TokenResponse(BaseModel):#Dữ liệu trả về sau khi đăng nhập thành công
+    created_at: Optional[datetime] = None
+    updated_at: Optional[datetime] = None
+
+    # Dòng này giúp Pydantic ép kiểu dữ liệu ORM Model sang JSON không bị lỗi 500
+    model_config = ConfigDict(from_attributes=True)
+
+# Schema trả về Token khi Login thành công
+class TokenResponse(BaseModel):
     access_token: str
     token_type: str = "bearer"

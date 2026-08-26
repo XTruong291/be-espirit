@@ -8,15 +8,15 @@ class Settings(BaseSettings):
     MYSQL_SERVER: str = "127.0.0.1"
     MYSQL_PORT: int = 3306
     MYSQL_DB: str = "test_db"
-    #Bổ sung cấu hình JWT
+    
     SECRET_KEY: str = "YOUR_SUPER_SECRET_KEY_CHANGE_THIS_IN_PRODUCTION"
     ALGORITHM: str = "HS256"
-    ACCESS_TOKEN_EXPIRE_MINUTES: int = 60  # Thời gian sống của access token 
+    ACCESS_TOKEN_EXPIRE_MINUTES: int = 60
 
     @property
     def DATABASE_URL(self) -> str:
-        password = f":{quote_plus(self.MYSQL_PASSWORD)}" if self.MYSQL_PASSWORD else ""
-        return f"mysql+aiomysql://{self.MYSQL_USER}{password}@{self.MYSQL_SERVER}:{self.MYSQL_PORT}/{self.MYSQL_DB}"
+        password = quote_plus(self.MYSQL_PASSWORD)
+        return f"mysql+aiomysql://{self.MYSQL_USER}:{password}@{self.MYSQL_SERVER}:{self.MYSQL_PORT}/{self.MYSQL_DB}"
 
     class Config:
         env_file = ".env"
