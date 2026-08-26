@@ -4,17 +4,25 @@ from sqlalchemy.ext.asyncio import AsyncSession
 # pyrefly: ignore [missing-import]
 from sqlalchemy import text
 from app.core.database import get_db
+from app.api.v1.endpoints.auth import router as auth_router
 
-app = FastAPI(title="FastAPI Async MySQL Starter")
+app = FastAPI(
+    title="BE-Espirit API",
+    description="Backend API services for BE-Espirit"
+)
 
-@app.get("/")
+# 1. Đăng ký các router
+app.include_router(auth_router, prefix="/api/v1/auth", tags=["Auth"])
+
+# 2. Trang chủ Welcome
+@app.get("/", tags=["Root"])
 def read_root():
-    return {"message": "Welcome to the FastAPI Async MySQL Starter API"}
+    return {"message": "Welcome to BE-Espirit API Services"}
 
-@app.get("/db-check")
+# 3. Endpoint kiểm tra kết nối Database
+@app.get("/db-check", tags=["Health Check"])
 async def db_check(db: AsyncSession = Depends(get_db)):
     try:
-        # Execute raw query SELECT 1 to verify connection
         result = await db.execute(text("SELECT 1"))
         result.fetchone()
         return {"database": "connected"}

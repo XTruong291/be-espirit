@@ -1,5 +1,8 @@
-fastapi[standard]
+﻿fastapi[standard]
 pydantic-settings
 sqlalchemy>=2.0.0
 aiomysql
 cryptography
+PyJWT==2.13.0
+passlib[bcrypt]
+python-multipart

@@ -8,6 +8,10 @@ class Settings(BaseSettings):
     MYSQL_SERVER: str = "127.0.0.1"
     MYSQL_PORT: int = 3306
     MYSQL_DB: str = "test_db"
+    #Bổ sung cấu hình JWT
+    SECRET_KEY: str = "YOUR_SUPER_SECRET_KEY_CHANGE_THIS_IN_PRODUCTION"
+    ALGORITHM: str = "HS256"
+    ACCESS_TOKEN_EXPIRE_MINUTES: int = 60  # Thời gian sống của access token 
 
     @property
     def DATABASE_URL(self) -> str:
