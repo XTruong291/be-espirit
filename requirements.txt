@@ -1,4 +1,4 @@
-fastapi[standard]
+﻿fastapi[standard]
 pydantic-settings
 sqlalchemy>=2.0.0
 aiomysql
