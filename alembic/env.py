@@ -1,3 +1,4 @@
+import ssl
 import asyncio
 from logging.config import fileConfig
 
@@ -10,38 +11,19 @@ from sqlalchemy.ext.asyncio import async_engine_from_config
 
 from alembic import context
 
-# 1. Import config và metadata từ dự án FastAPI của bạn
 from app.core.config import settings
 from app.models import Base
 
-# this is the Alembic Config object, which provides
-# access to the values within the .ini file in use.
 config = context.config
 
-# Interpret the config file for Python logging.
-# This line sets up loggers basically.
 if config.config_file_name is not None:
     fileConfig(config.config_file_name)
 
-# 2. Ghi đè cấu hình động sqlalchemy.url bằng chuỗi kết nối thực tế trong .env
 config.set_main_option("sqlalchemy.url", settings.DATABASE_URL)
-
-# 3. Gán target_metadata để nhận diện cấu trúc model của User
 target_metadata = Base.metadata
 
 
 def run_migrations_offline() -> None:
-    """Run migrations in 'offline' mode.
-
-    This configures the context with just a URL
-    and not an Engine, though an Engine is acceptable
-    here as well.  By skipping the Engine creation
-    we don't even need a DBAPI to be available.
-
-    Calls to context.execute() here emit the given string to the
-    script output.
-
-    """
     url = config.get_main_option("sqlalchemy.url")
     context.configure(
         url=url,
@@ -62,15 +44,17 @@ def do_run_migrations(connection: Connection) -> None:
 
 
 async def run_async_migrations() -> None:
-    """In this scenario we need to create an Engine
-    and associate a connection with the context.
-
-    """
+    # Cấu hình SSL cho Alembic khi chạy trên Cloud
+    connect_args = {}
+    if settings.MYSQL_SERVER not in ("localhost", "127.0.0.1", "db"):
+        ssl_context = ssl.create_default_context()
+        connect_args["ssl"] = ssl_context
 
     connectable = async_engine_from_config(
         config.get_section(config.config_ini_section, {}),
         prefix="sqlalchemy.",
         poolclass=pool.NullPool,
+        connect_args=connect_args,
     )
 
     async with connectable.connect() as connection:
@@ -80,8 +64,6 @@ async def run_async_migrations() -> None:
 
 
 def run_migrations_online() -> None:
-    """Run migrations in 'online' mode."""
-
     asyncio.run(run_async_migrations())
 
 
