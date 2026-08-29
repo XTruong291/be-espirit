@@ -9,9 +9,9 @@ class Settings(BaseSettings):
     MYSQL_PORT: int = 3306
     MYSQL_DB: str = "test_db"
     
-    SECRET_KEY: str = "YOUR_SUPER_SECRET_KEY_CHANGE_THIS_IN_PRODUCTION"
+    SECRET_KEY: str
     ALGORITHM: str = "HS256"
-    ACCESS_TOKEN_EXPIRE_MINUTES: int = 60
+    ACCESS_TOKEN_EXPIRE_MINUTES: int = 180
 
     @property
     def DATABASE_URL(self) -> str:
