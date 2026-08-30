@@ -8,6 +8,7 @@ from sqlalchemy.exc import SQLAlchemyError
 # pyrefly: ignore [missing-import]
 from sqlalchemy import text
 
+from fastapi.middleware.cors import CORSMiddleware
 from app.core.database import get_db
 from app.core.exceptions import BaseAppException
 from app.core.error_handlers import (
@@ -23,6 +24,15 @@ from app.api.v1.endpoints.users import router as users_router
 app = FastAPI(
     title="BE-Espirit API",
     description="Backend API services for BE-Espirit"
+)
+
+# Cấu hình CORS mở rộng cho phép tất cả các domain gọi API
+app.add_middleware(
+    CORSMiddleware,
+    allow_origin_regex="https?://.*",
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 # 1. Đăng ký các router
