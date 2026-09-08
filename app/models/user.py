@@ -4,7 +4,8 @@ from sqlalchemy import Column, Integer, String, Boolean, DateTime
 # pyrefly: ignore [missing-import]
 from sqlalchemy.sql import func
 # pyrefly: ignore [missing-import]
-from sqlalchemy.orm import DeclarativeBase
+# pyrefly: ignore [missing-import]
+from sqlalchemy.orm import DeclarativeBase, relationship
 
 
 class Base(DeclarativeBase):
@@ -21,3 +22,5 @@ class User(Base):
     role = Column(String(20), default="user", nullable=False)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
+
+    chat_sessions = relationship("ChatSession", back_populates="user", cascade="all, delete-orphan")
