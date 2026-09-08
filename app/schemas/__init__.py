@@ -7,6 +7,13 @@ from .chat import (
     ChatMessageResponse,
     ChatHistoryResponse,
 )
+from .calendar import (
+    HourInfo,
+    LunarDateResponse,
+    MonthCalendarResponse,
+    AuspiciousHoursResponse,
+    LunarToSolarResponse,
+)
 
 __all__ = [
     "UserRegisterRequest",
@@ -21,5 +28,11 @@ __all__ = [
     "ChatMessageCreate",
     "ChatMessageResponse",
     "ChatHistoryResponse",
+    "HourInfo",
+    "LunarDateResponse",
+    "MonthCalendarResponse",
+    "AuspiciousHoursResponse",
+    "LunarToSolarResponse",
 ]
+
 
