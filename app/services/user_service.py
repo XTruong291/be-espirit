@@ -1,16 +1,21 @@
+from fastapi import UploadFile
+from typing import Optional
 from app.repositories.user_repository import UserRepository
 from app.models.user import User
 from app.schemas.user import UserAdminUpdateRequest
 from app.core.security import get_password_hash
 from app.core.exceptions import NotFoundException, ForbiddenException, DuplicateException
+from app.services.storage_service import StorageService
 
 
 class UserService:
     """
     Tầng Service chứa các logic nghiệp vụ liên quan đến quản lý thông tin User chung.
     """
-    def __init__(self, user_repo: UserRepository):
+    def __init__(self, user_repo: UserRepository, storage_service: Optional[StorageService] = None):
         self.user_repo = user_repo
+        self.storage_service = storage_service or StorageService()
+
 
     async def get_all_users(self, skip: int = 0, limit: int = 100) -> list[User]:
         """Lấy danh sách tất cả người dùng (Admin)."""
@@ -43,7 +48,8 @@ class UserService:
                 raise ForbiddenException("Bạn không có quyền thay đổi vai trò.")
 
         # 2. Chuẩn bị dữ liệu cập nhật
-        update_data = payload.model_dump(exclude_unset=True)
+        update_data = {k: v for k, v in payload.model_dump(exclude_unset=True).items() if v is not None}
+
 
         # Xử lý đổi tên đăng nhập: kiểm tra trùng lặp với tài khoản khác
         if "username" in update_data:
@@ -84,3 +90,20 @@ class UserService:
 
         # Thực thi xóa
         await self.user_repo.delete(target_user)
+
+    async def upload_avatar(self, user_id: int, file: UploadFile, requesting_user: User) -> User:
+        """Upload ảnh đại diện lên Cloudinary và lưu avatar_url vào Database."""
+        target_user = await self.user_repo.get_by_id(user_id)
+        if not target_user:
+            raise NotFoundException("Không tìm thấy người dùng.")
+
+        # Phân quyền: User thường chỉ được upload avatar của chính mình, Admin upload cho bất kỳ ai
+        if requesting_user.role != "admin" and requesting_user.id != user_id:
+            raise ForbiddenException("Bạn không có quyền cập nhật ảnh đại diện cho người dùng này.")
+
+        # Upload file qua StorageService
+        secure_url = await self.storage_service.upload_avatar(file, user_id)
+
+        # Cập nhật Database
+        return await self.user_repo.update(target_user, {"avatar_url": secure_url})
+

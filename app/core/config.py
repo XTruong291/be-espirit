@@ -13,6 +13,12 @@ class Settings(BaseSettings):
     ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 180
 
+    # Cấu hình lưu trữ đám mây Cloudinary
+    CLOUDINARY_CLOUD_NAME: str = ""
+    CLOUDINARY_API_KEY: str = ""
+    CLOUDINARY_API_SECRET: str = ""
+
+
     @property
     def DATABASE_URL(self) -> str:
         password = quote_plus(self.MYSQL_PASSWORD)

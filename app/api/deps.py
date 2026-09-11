@@ -11,6 +11,7 @@ from app.services.auth_service import AuthService
 from app.services.user_service import UserService
 from app.services.ai_service import AIService
 from app.services.chat_service import ChatService
+from app.services.storage_service import StorageService
 from app.core.exceptions import ForbiddenException
 
 # Chuyển từ OAuth2PasswordBearer sang HTTPBearer để dán trực tiếp Token trên Swagger UI
@@ -32,6 +33,11 @@ def get_ai_service() -> AIService:
     return AIService()
 
 
+def get_storage_service() -> StorageService:
+    """Dependency provider cho StorageService (Cloudinary)."""
+    return StorageService()
+
+
 def get_chat_service(
     chat_repo: ChatRepository = Depends(get_chat_repository),
     ai_service: AIService = Depends(get_ai_service),
@@ -45,9 +51,13 @@ def get_auth_service(user_repo: UserRepository = Depends(get_user_repository)) -
     return AuthService(user_repo)
 
 
-def get_user_service(user_repo: UserRepository = Depends(get_user_repository)) -> UserService:
+def get_user_service(
+    user_repo: UserRepository = Depends(get_user_repository),
+    storage_service: StorageService = Depends(get_storage_service),
+) -> UserService:
     """Dependency provider cho UserService."""
-    return UserService(user_repo)
+    return UserService(user_repo=user_repo, storage_service=storage_service)
+
 
 
 

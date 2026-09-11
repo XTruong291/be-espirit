@@ -176,9 +176,11 @@ Truy cập tài liệu API tại: [http://127.0.0.1:8000/docs](http://127.0.0.1:
 | **Auth** | `POST` | `/api/v1/auth/register` | Đăng ký tài khoản người dùng mới | Public |
 | **Auth** | `POST` | `/api/v1/auth/login` | Đăng nhập và nhận JWT Access Token | Public |
 | **Users** | `GET` | `/api/v1/users/me` | Lấy thông tin tài khoản đang đăng nhập | Bearer Token |
-| **Users** | `PUT` | `/api/v1/users/me` | Cập nhật thông tin cá nhân (username, email, pass) | Bearer Token |
+| **Users** | `PUT` | `/api/v1/users/me` | Cập nhật thông tin cá nhân (username, email, pass, avatar) | Bearer Token |
+| **Users** | `POST` | `/api/v1/users/me/avatar` | Tải lên file ảnh đại diện (Cloudinary, auto-crop 300x300, max 5MB) | Bearer Token |
 | **Users** | `GET` | `/api/v1/users/` | Danh sách tất cả người dùng (Phân trang) | Admin |
 | **Users** | `PUT` | `/api/v1/users/{user_id}` | Cập nhật thông tin & vai trò người dùng bất kỳ | Admin |
+
 | **Chat** | `GET` | `/api/v1/chat/sessions` | Lấy danh sách các phiên chat của user | Bearer Token |
 | **Chat** | `POST` | `/api/v1/chat/sessions` | Tạo một phiên trò chuyện mới | Bearer Token |
 | **Chat** | `GET` | `/api/v1/chat/sessions/{id}/messages` | Lấy toàn bộ lịch sử tin nhắn trong phiên chat | Bearer Token |

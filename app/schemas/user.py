@@ -18,7 +18,8 @@ class UserResponse(BaseModel):
     id: int
     username: str
     email: EmailStr
-    role: str = "user"      
+    role: str = "user"
+    avatar_url: Optional[str] = None
     created_at: Optional[datetime] = None
     updated_at: Optional[datetime] = None
 
@@ -35,6 +36,7 @@ class UserUpdateRequest(BaseModel):
     username: Optional[str] = None
     email: Optional[EmailStr] = None
     password: Optional[str] = None
+    avatar_url: Optional[str] = None
 
 # Schema cho Admin cập nhật thông tin bất kỳ User nào
 class UserAdminUpdateRequest(BaseModel):
@@ -42,3 +44,5 @@ class UserAdminUpdateRequest(BaseModel):
     email: Optional[EmailStr] = None
     password: Optional[str] = None
     role: Optional[str] = None
+    avatar_url: Optional[str] = None
+
