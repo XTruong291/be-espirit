@@ -1,3 +1,4 @@
+from datetime import datetime
 from typing import Optional
 # pyrefly: ignore [missing-import]
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -63,4 +64,41 @@ class UserRepository:
         """Xóa hoàn toàn một User khỏi DB."""
         await self.db.delete(user)
         await self.db.commit()
+
+    async def get_by_reset_token(self, token_hash: str) -> Optional[User]:
+        """Tìm user dựa trên chuỗi hash của reset token."""
+        result = await self.db.execute(
+            select(User).where(User.reset_token == token_hash)
+        )
+        return result.scalars().first()
+
+    async def save_reset_token(
+        self,
+        user: User,
+        token_hash: str,
+        expires_at: datetime,
+        request_time: datetime
+    ) -> User:
+        """Lưu token đặt lại mật khẩu và cập nhật thời gian yêu cầu gần nhất."""
+        user.reset_token = token_hash
+        user.reset_expires_at = expires_at
+        user.last_reset_request = request_time
+        self.db.add(user)
+        await self.db.commit()
+        await self.db.refresh(user)
+        return user
+
+    async def update_password_and_clear_token(
+        self,
+        user: User,
+        new_hashed_password: str
+    ) -> User:
+        """Cập nhật mật khẩu mới và hủy bỏ token (Single-use token)."""
+        user.hashed_password = new_hashed_password
+        user.reset_token = None
+        user.reset_expires_at = None
+        self.db.add(user)
+        await self.db.commit()
+        await self.db.refresh(user)
+        return user
 
