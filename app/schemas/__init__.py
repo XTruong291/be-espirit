@@ -1,4 +1,5 @@
 from .user import UserRegisterRequest, UserLoginRequest, UserResponse, TokenResponse, UserUpdateRequest, UserAdminUpdateRequest
+from .auth import ForgotPasswordRequest, ResetPasswordRequest, MessageResponse
 from .chat import (
     ChatSessionCreate,
     ChatSessionResponse,
@@ -20,6 +21,9 @@ __all__ = [
     "UserLoginRequest",
     "UserResponse",
     "TokenResponse",
+    "ForgotPasswordRequest",
+    "ResetPasswordRequest",
+    "MessageResponse",
     "UserUpdateRequest",
     "UserAdminUpdateRequest",
     "ChatSessionCreate",

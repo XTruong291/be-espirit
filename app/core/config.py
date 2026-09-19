@@ -18,6 +18,20 @@ class Settings(BaseSettings):
     CLOUDINARY_API_KEY: str = ""
     CLOUDINARY_API_SECRET: str = ""
 
+    # Cấu hình Quên/Đặt lại mật khẩu & Frontend URL
+    FRONTEND_URL: str = "http://localhost:3000"
+    RESET_PASSWORD_TOKEN_EXPIRE_MINUTES: int = 15
+    RESET_PASSWORD_COOLDOWN_MINUTES: int = 2
+
+    # Cấu hình SMTP Email (aiosmtplib)
+    SMTP_HOST: str = "smtp.gmail.com"
+    SMTP_PORT: int = 587
+    SMTP_USER: str = ""
+    SMTP_PASSWORD: str = ""
+    SMTP_FROM_EMAIL: str = "noreply@espirit.com"
+    SMTP_FROM_NAME: str = "E-Spirit Support"
+    SMTP_TLS: bool = True
+
 
     @property
     def DATABASE_URL(self) -> str:

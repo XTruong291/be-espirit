@@ -8,4 +8,5 @@ alembic
 bcrypt
 tzdata
 cloudinary>=1.36.0
+aiosmtplib
 

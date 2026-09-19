@@ -24,5 +24,9 @@ class User(Base):
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
 
+    # Các cột phục vụ Quên mật khẩu & Chống spam Rate Limit
+    reset_token = Column(String(255), nullable=True, index=True)
+    reset_expires_at = Column(DateTime(timezone=True), nullable=True)
+    last_reset_request = Column(DateTime(timezone=True), nullable=True)
 
     chat_sessions = relationship("ChatSession", back_populates="user", cascade="all, delete-orphan")
