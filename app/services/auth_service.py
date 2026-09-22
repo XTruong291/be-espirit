@@ -1,13 +1,9 @@
-<<<<<<< HEAD
 import asyncio
-=======
->>>>>>> 3130b0cd266eba590f5f88c55633477c151efcbf
 import random
 import smtplib
 import time
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
-<<<<<<< HEAD
 
 from app.core.config import settings
 from app.core.exceptions import (
@@ -15,12 +11,6 @@ from app.core.exceptions import (
     DuplicateException,
     UnauthorizedException,
 )
-=======
-from fastapi import HTTPException, status
-
-from app.core.config import settings
-from app.core.exceptions import DuplicateException, UnauthorizedException
->>>>>>> 3130b0cd266eba590f5f88c55633477c151efcbf
 from app.core.security import (
     create_access_token,
     decode_access_token,
@@ -31,7 +21,6 @@ from app.models.user import User
 from app.repositories.user_repository import UserRepository
 from app.schemas.user import TokenResponse, UserLoginRequest, UserRegisterRequest
 
-<<<<<<< HEAD
 # Bộ nhớ tạm lưu mã OTP (Lưu trữ: code, expires_at, last_sent, attempts, is_verified)
 otp_db = {}
 OTP_EXPIRE_SECONDS = 300  # 5 phút
@@ -41,23 +30,10 @@ MAX_VERIFY_ATTEMPTS = 5  # Tối đa 5 lần nhập sai
 
 class AuthService:
     """Tầng Service chứa toàn bộ logic nghiệp vụ liên quan đến xác thực (Auth)."""
-=======
-# Bộ nhớ tạm lưu mã OTP (Hết hạn sau 5 phút)
-otp_db = {}
-OTP_EXPIRE_SECONDS = 300
-
-
-class AuthService:
-    """Tầng Service chứa toàn bộ logic nghiệp vụ liên quan đến xác thực (Auth),
-
-    kiểm tra dữ liệu đầu vào và gọi Tầng Repository để tương tác DB.
-    """
->>>>>>> 3130b0cd266eba590f5f88c55633477c151efcbf
 
     def __init__(self, user_repo: UserRepository):
         self.user_repo = user_repo
 
-<<<<<<< HEAD
     # --- HÀM PHỤ TRỢ: GỬI MAIL ĐỒNG BỘ NẰM TRONG THREAD RIÊNG ---
     def _send_email_sync(self, recipient: str, message: MIMEMultipart):
         """Chạy hàm gửi mail đồng bộ để tránh block Async Event Loop."""
@@ -66,7 +42,7 @@ class AuthService:
             server.login(settings.SENDER_EMAIL, settings.SENDER_PASSWORD)
             server.sendmail(settings.SENDER_EMAIL, recipient, message.as_string())
 
-    # TÍNH NĂNG XÁC THỰC OTP EMAIL 
+    # TÍNH NĂNG XÁC THỰC OTP EMAIL
 
     async def send_otp(self, email: str) -> dict:
         """Tạo mã OTP 6 số ngẫu nhiên và gửi qua Gmail."""
@@ -99,19 +75,6 @@ class AuthService:
         }
 
         # 4. Cấu hình nội dung Email
-=======
-    # ==================== TÍNH NĂNG XÁC THỰC OTP GMAIL ====================
-
-    async def send_otp(self, email: str) -> dict:
-        """Tạo mã OTP 6 số ngẫu nhiên và gửi qua Gmail."""
-        otp_code = str(random.randint(100000, 999999))
-        expires_at = time.time() + OTP_EXPIRE_SECONDS
-
-        # 1. Lưu mã OTP cùng thời gian hết hạn vào RAM
-        otp_db[email] = {"code": otp_code, "expires_at": expires_at}
-
-        # 2. Cấu hình nội dung Email
->>>>>>> 3130b0cd266eba590f5f88c55633477c151efcbf
         msg = MIMEMultipart("alternative")
         msg["Subject"] = f"[{otp_code}] Mã xác minh địa chỉ Email"
         msg["From"] = settings.SENDER_EMAIL
@@ -127,8 +90,7 @@ class AuthService:
         """
         msg.attach(MIMEText(html_content, "html"))
 
-<<<<<<< HEAD
-        # 5. Gửi thư không gây treo server 
+        # 5. Gửi thư không gây treo server
         try:
             await asyncio.to_thread(self._send_email_sync, email, msg)
         except smtplib.SMTPRecipientsRefused:
@@ -142,18 +104,6 @@ class AuthService:
             raise BaseAppException(
                 message=f"Không thể gửi email xác thực: {str(e)}",
                 status_code=500,
-=======
-        # 3. Kết nối Server Gmail SMTP để gửi thư
-        try:
-            with smtplib.SMTP("smtp.gmail.com", 587) as server:
-                server.starttls()
-                server.login(settings.SENDER_EMAIL, settings.SENDER_PASSWORD)
-                server.sendmail(settings.SENDER_EMAIL, email, msg.as_string())
-        except Exception as e:
-            raise HTTPException(
-                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                detail=f"Không thể gửi email xác thực: {str(e)}",
->>>>>>> 3130b0cd266eba590f5f88c55633477c151efcbf
             )
 
         return {"message": f"Mã xác nhận đã được gửi thành công tới {email}"}
@@ -163,7 +113,6 @@ class AuthService:
         record = otp_db.get(email)
 
         if not record:
-<<<<<<< HEAD
             raise BaseAppException(
                 message="Email này chưa yêu cầu mã xác thực hoặc mã đã bị hủy.",
                 status_code=400,
@@ -201,35 +150,7 @@ class AuthService:
             "message": "Xác thực Gmail thành công! Bạn có thể tiến hành đăng ký.",
         }
 
-    #  CÁC LUỒNG XÁC THỰC TÀI KHOẢN 
-=======
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail="Email này chưa yêu cầu mã xác thực hoặc mã đã bị hủy.",
-            )
-
-        if time.time() > record["expires_at"]:
-            del otp_db[email]
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail="Mã OTP đã hết hạn (quá 5 phút). Vui lòng yêu cầu mã mới.",
-            )
-
-        if record["code"] != code:
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail="Mã xác thực không chính xác! Vui lòng kiểm tra lại.",
-            )
-
-        # Nhập đúng -> Xóa mã khỏi RAM và chấp nhận thành công
-        del otp_db[email]
-        return {
-            "status": "success",
-            "message": "Xác thực Gmail thành công! Email hợp lệ.",
-        }
-
-    # ==================== LUỒNG XÁC THỰC TÀI KHOẢN CŨ ====================
->>>>>>> 3130b0cd266eba590f5f88c55633477c151efcbf
+    #  CÁC LUỒNG XÁC THỰC TÀI KHOẢN
 
     async def register_user(self, payload: UserRegisterRequest) -> User:
         """Logic Đăng ký người dùng mới (Yêu cầu phải Verify OTP trước)."""
@@ -263,35 +184,22 @@ class AuthService:
         # 4. Lưu vào DB thông qua Repository
         created_user = await self.user_repo.create(new_user)
 
-<<<<<<< HEAD
         # 5. Đăng ký thành công -> Xóa trạng thái OTP khỏi bộ nhớ
         if payload.email in otp_db:
             del otp_db[payload.email]
 
         return created_user
 
-=======
->>>>>>> 3130b0cd266eba590f5f88c55633477c151efcbf
     async def authenticate_user(
         self, credentials: UserLoginRequest
     ) -> TokenResponse:
         """Logic Đăng nhập và tạo JWT Access Token."""
         user = await self.user_repo.get_by_username(credentials.username)
 
-<<<<<<< HEAD
         if not user or not verify_password(
             credentials.password, user.hashed_password
         ):
             raise UnauthorizedException("Tài khoản hoặc mật khẩu không chính xác.")
-=======
-        # 2. Xác thực tài khoản và mật khẩu
-        if not user or not verify_password(
-            credentials.password, user.hashed_password
-        ):
-            raise UnauthorizedException(
-                "Tài khoản hoặc mật khẩu không chính xác."
-            )
->>>>>>> 3130b0cd266eba590f5f88c55633477c151efcbf
 
         access_token = create_access_token(
             subject=str(user.id), extra_data={"username": user.username}
