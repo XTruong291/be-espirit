@@ -7,9 +7,16 @@ class BaseAppException(Exception):
     error_code: str = "INTERNAL_SERVER_ERROR"
     message: str = "Đã xảy ra lỗi hệ thống."
 
-    def __init__(self, message: Optional[str] = None, details: Any = None):
+    def __init__(
+        self,
+        message: Optional[str] = None,
+        status_code: Optional[int] = None,
+        details: Any = None
+    ):
         if message:
             self.message = message
+        if status_code is not None:
+            self.status_code = status_code
         self.details = details
         super().__init__(self.message)
 
